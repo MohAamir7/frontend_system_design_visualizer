@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>System Design Visualizer</h1>
+        <!-- <button class="simulate-btn">Simulate</button> -->
+
+    </header>
+    
+    <div class="app">
+        <aside class="sidebar">
+             <h3>Components</h3>
+            <div class="node" id="client">Client</div>
+            <div class="node" id="api">API Server</div>
+            <div class="node" id="cache">Cache</div>
+            <div class="node" id="databse">DataBase</div>
+        </aside>
+
+        <div class="canvas-container">
+            <button class="simulate-btn">Simulate</button>
+            <div id="canvas">
+
+            </div>
+        </div>
+        <section class="config">
+           <h3>Configuration</h3>
+
+      <label for="latency">Latency (ms)</label>
+      <input type="number" id="latency" placeholder="e.g. 50" />
+
+      <label for="failure">Failure Rate (%)</label>
+      <input type="number" id="failure" placeholder="e.g. 1" />
+
+      <label for="throughput">Throughput</label>
+      <input type="number" id="throughput" placeholder="Requests/sec" />
+    </aside>
+
+        </section>
+
+    </div>
+    
+
+    </div>
+</body>
+<script src="script.js"></script>
+</html>

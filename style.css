@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+body {
+  background: #0b1320;
+  overflow: hidden;
+  color: #e5e7eb;
+  height: 100vh;
+}
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr 300px;
+  height: calc(100vh-70px);
+}
+header{
+    padding: 16px 24px;
+    font-weight: 600;
+    border: 1px solid #1f2937;
+    font-size: 28px;
+}
+.sidebar{
+    border: 1px solid #1f2937;
+    padding: 20px 24px;
+}
+.sidebar h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.node{
+    padding: 19px 15px;
+    margin: 10px 10px;
+    border: 1px solid #334155;
+    background: #111827;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.2s, transform 0.2s;
+}
+.node:hover{
+    background: #1e293b;
+  transform: translateY(-2px);
+}
+.canvas-container{
+    position: relative;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    overflow: hidden;
+}
+.simulate-btn{
+    position: relative;
+    top: 20px;
+    left: 50%;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    color: white;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+}
+.simulate-btn:hover{
+    opacity: 0.9;
+}
+.config {
+  border-left: 1px solid #1f2937;
+  padding: 20px;
+}
+
+.config h3 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.config label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #cbd5f5;
+}
+
+.config input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.config input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
