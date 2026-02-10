@@ -15,7 +15,7 @@ document.querySelectorAll(".node").forEach((template) => {
     nodes.push({
       id: Date.now(),
       el,
-      latency: 50,
+      latency: 5000,
       failureRate: 0.01,
     });
     // console.log(nodes[0].id);
@@ -25,29 +25,29 @@ document.querySelectorAll(".node").forEach((template) => {
 function makeDragable(el) {
   // console.log("start dragging");
   let offsetX, offsetY;
-  el.addEventListener('mousedown', (e) => {
+  el.addEventListener("mousedown", (e) => {
     // console.log(e.clientX);
     offsetX = e.clientX;
     offsetY = e.clientY;
     console.log(offsetX, offsetY);
     // el.addEventListener("mousemove",mouseMovehandler);
     // el.addEventListener("mouseUp",mouseUp);/
-    document.onmousemove = ev => {
+    document.onmousemove = (ev) => {
       el.style.left = `${ev.pageX - offsetX}px`;
       el.style.top = `${ev.pageY - offsetY}px`;
       updateline();
-    }
+    };
     document.onmouseup = () => {
       document.onmousemove = null;
-    }
-  })
+    };
+  });
 }
 
 let selectNode = null;
 const edges = [];
 
 const svg = document.getElementById("connections");
-canvas.addEventListener("click", e => {
+canvas.addEventListener("click", (e) => {
   // console.log(e.target);
   if (!e.target.classList.contains("node-instance")) return;
 
@@ -88,7 +88,7 @@ function drawline(from, to) {
 }
 function updateline() {
   const canvasRect = canvas.getBoundingClientRect();
-  edges.forEach(({ from, to, line })=>{
+  edges.forEach(({ from, to, line }) => {
     const r1 = from.getBoundingClientRect();
     const r2 = to.getBoundingClientRect();
     const x1 = r1.left + r1.width / 2 - canvasRect.left;
@@ -100,30 +100,72 @@ function updateline() {
     line.setAttribute("y1", y1);
     line.setAttribute("x2", x2);
     line.setAttribute("y2", y2);
-
   });
 }
+function addLog(msg) {
+  console.log(msg);
+  
+}
+function animateEdge(fromNode, toNode) {
+  const edge = edges.find(e => e.from === fromNode && e.to === toNode);
+  if (!edge) return;
 
-const simulate = document.getElementById('simulate-btn');
+  edge.line.style.strokeDasharray = "5";
+  edge.line.style.animation = "flow 1s linear infinite";
+}
 
-simulate.addEventListener('click',simulateFunc);
-function simulateFunc() {
-  let totalLatency = 0;
-  let failed = false;
+function stopEdge(fromNode, toNode) {
+  const edge = edges.find(e => e.from === fromNode && e.to === toNode);
+  if (!edge) return;
 
-  nodes.forEach(node => {
-    totalLatency += 50;
-
-    if (Math.random() < 0.05) {
-      failed = true;
+  edge.line.style.animation = "";
+}
+function processed(node,prevNode) {
+   return new Promise((res,rej)=>{
+    if(prevNode){
+      animateEdge(prevNode.el,node.el);
     }
-  });
+    addLog(`Request entered ${node.el.textContent}`);
+    setTimeout(()=>{
+      const failed = Math.random()<node.failureRate;
+      if(prevNode){
+        stopEdge(prevNode.el,node.el);
+      }
+      if(failed){
+        addLog(`${node.el.textContent} FAILED ❌`)
+        rej(`Failed at ${node.el.textContent}`);
+      }else{
+        addLog(`${node.el.textContent} processed successfully ✅`);
+        res(node.latency)
+      }
+    },5000)
+   })  
+}
 
-  alert(
-    failed
-      ? `Request failed after ${totalLatency}ms`
-      : `Request success in ${totalLatency}ms`
-  );
+const simulate = document.getElementById("simulate-btn");
+
+simulate.addEventListener("click", simulateFunc);
+function simulateFunc() {
+  if(nodes.length === 0) return;
+  let totalLatency = 0;
+  
+  let chain = Promise.resolve();
+  nodes.forEach((node, idx) => {
+    chain = chain.then(() => {
+      const prevNode = idx === 0 ? null : nodes[idx - 1];
+      const latency = processed(node, prevNode);
+       return totalLatency += latency;
+    });
+  });
+  chain
+    .then(() => {
+      addLog("Request completed successfully 🎉");
+      alert(`Request SUCCESS in ${totalLatency}ms`);
+    })
+    .catch((error) => {
+      addLog(error);
+      alert(`Request FAILED after ${totalLatency}ms`);
+    });
 }
 
 // simulate.addEventListener("click",startFlowAnimation);
@@ -132,15 +174,10 @@ function simulateFunc() {
 //     line.classList.add("flow");
 //   });
 // }
-simulate.addEventListener("click",animateFlow);
-function animateFlow() {
-  edges.forEach(({line})=>{
-     line.style.strokeDasharray = "5";
-  line.style.animation = "flow 1s linear infinite";
-  });
-}
-
-
-
-
-
+// simulate.addEventListener("click", animateFlow);
+// function animateFlow() {
+//   edges.forEach(({ line }) => {
+//     line.style.strokeDasharray = "5";
+//     line.style.animation = "flow 1s linear infinite";
+//   });
+// }
