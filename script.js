@@ -26,9 +26,13 @@ function makeDragable(el) {
   // console.log("start dragging");
   let offsetX, offsetY;
   el.addEventListener("mousedown", (e) => {
+
+    const rect = el.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
     // console.log(e.clientX);
-    offsetX = e.clientX;
-    offsetY = e.clientY;
+    // offsetX = e.clientX;
+    // offsetY = e.clientY;
     console.log(offsetX, offsetY);
     // el.addEventListener("mousemove",mouseMovehandler);
     // el.addEventListener("mouseUp",mouseUp);/
@@ -147,14 +151,18 @@ const simulate = document.getElementById("simulate-btn");
 simulate.addEventListener("click", simulateFunc);
 function simulateFunc() {
   if(nodes.length === 0) return;
+   let running = true;
+
   let totalLatency = 0;
   
   let chain = Promise.resolve();
   nodes.forEach((node, idx) => {
     chain = chain.then(() => {
-      const prevNode = idx === 0 ? null : nodes[idx - 1];
-      const latency = processed(node, prevNode);
-       return totalLatency += latency;
+      return prevNode = idx === 0 ? null : nodes[idx - 1];
+      return latency = processed(node, prevNode).then((latency)=>{
+        totalLatency += latency;
+
+      });
     });
   });
   chain
@@ -174,10 +182,10 @@ function simulateFunc() {
 //     line.classList.add("flow");
 //   });
 // }
-// simulate.addEventListener("click", animateFlow);
-// function animateFlow() {
-//   edges.forEach(({ line }) => {
-//     line.style.strokeDasharray = "5";
-//     line.style.animation = "flow 1s linear infinite";
-//   });
-// }
+simulate.addEventListener("click", animateFlow);
+function animateFlow() {
+  edges.forEach(({ line }) => {
+    line.style.strokeDasharray = "5";
+    line.style.animation = "flow 1s linear infinite";
+  });
+}
