@@ -1,5 +1,6 @@
 const canvas = document.getElementById("canvas");
 const nodes = [];
+let nodecounter = 0;
 
 document.querySelectorAll(".node").forEach((template) => {
   template.addEventListener("click", () => {
@@ -7,13 +8,15 @@ document.querySelectorAll(".node").forEach((template) => {
     const el = document.createElement("div");
     el.className = "node-instance";
     el.textContent = template.textContent;
+    el.dataset.type = template.dataset.type;
     el.style.top = "100px";
     el.style.left = "100px";
     canvas.appendChild(el);
     makeDragable(el);
 
     nodes.push({
-      id: Date.now(),
+      id: nodecounter++,
+      type: template.dataset.type,
       el,
       latency: 5000,
       failureRate: 0.01,
@@ -65,6 +68,17 @@ canvas.addEventListener("click", (e) => {
     selectNode = null;
   }
 });
+function edgePoint(rect, canvasRect, targetX, targetY) {
+  const cx = rect.left + rect.width / 2 - canvasRect.left;
+  const cy = rect.top + rect.height / 2 - canvasRect.top;
+  const a = rect.width / 2;
+  const b = rect.height / 2;
+  const dx = targetX - cx;
+  const dy = targetY - cy;
+  const angle = Math.atan2(dy, dx);
+  const t = 1 / Math.sqrt(Math.pow(Math.cos(angle) / a, 2) + Math.pow(Math.sin(angle) / b, 2));
+  return { x: cx + t * Math.cos(angle), y: cy + t * Math.sin(angle) };
+}
 
 function drawline(from, to) {
   const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -73,18 +87,23 @@ function drawline(from, to) {
   const r2 = to.getBoundingClientRect();
 
   // Center of nodes, relative to canvas
-  const x1 = r1.left + r1.width / 2 - canvasRect.left;
-  const y1 = r1.top + r1.height / 2 - canvasRect.top;
-  const x2 = r2.left + r2.width / 2 - canvasRect.left;
-  const y2 = r2.top + r2.height / 2 - canvasRect.top;
+  // const x1 = r1.left + r1.width / 2 - canvasRect.left;
+  // const y1 = r1.top + r1.height / 2 - canvasRect.top;
+  // const x2 = r2.left + r2.width / 2 - canvasRect.left;
+  // const y2 = r2.top + r2.height / 2 - canvasRect.top;
+  const c1 = { x: r1.left + r1.width / 2 - canvasRect.left, y: r1.top + r1.height / 2 - canvasRect.top };
+  const c2 = { x: r2.left + r2.width / 2 - canvasRect.left, y: r2.top + r2.height / 2 - canvasRect.top };
 
-  line.setAttribute("x1", x1);
-  line.setAttribute("y1", y1);
-  line.setAttribute("x2", x2);
-  line.setAttribute("y2", y2);
+  const p1 = edgePoint(r1, canvasRect, c2.x, c2.y);
+  const p2 = edgePoint(r2, canvasRect, c1.x, c1.y);
+  line.setAttribute("x1", p1.x);
+  line.setAttribute("y1", p1.y);
+  line.setAttribute("x2", p2.x);
+  line.setAttribute("y2", p2.y);
 
   line.setAttribute("stroke", "#38bdf8");
   line.setAttribute("stroke-width", "2");
+  line.setAttribute("marker-end", "url(#arrow)");
 
   svg.appendChild(line);
   edges.push({ from, to, line });
@@ -95,15 +114,20 @@ function updateline() {
   edges.forEach(({ from, to, line }) => {
     const r1 = from.getBoundingClientRect();
     const r2 = to.getBoundingClientRect();
-    const x1 = r1.left + r1.width / 2 - canvasRect.left;
-    const y1 = r1.top + r1.height / 2 - canvasRect.top;
-    const x2 = r2.left + r2.width / 2 - canvasRect.left;
-    const y2 = r2.top + r2.height / 2 - canvasRect.top;
+    // const x1 = r1.left + r1.width / 2 - canvasRect.left;
+    // const y1 = r1.top + r1.height / 2 - canvasRect.top;
+    // const x2 = r2.left + r2.width / 2 - canvasRect.left;
+    // const y2 = r2.top + r2.height / 2 - canvasRect.top;
+    const c1 = { x: r1.left + r1.width / 2 - canvasRect.left, y: r1.top + r1.height / 2 - canvasRect.top };
+    const c2 = { x: r2.left + r2.width / 2 - canvasRect.left, y: r2.top + r2.height / 2 - canvasRect.top };
 
-    line.setAttribute("x1", x1);
-    line.setAttribute("y1", y1);
-    line.setAttribute("x2", x2);
-    line.setAttribute("y2", y2);
+    const p1 = edgePoint(r1, canvasRect, c2.x, c2.y);
+    const p2 = edgePoint(r2, canvasRect, c1.x, c1.y);
+
+    line.setAttribute("x1", p1.x);
+    line.setAttribute("y1", p1.y);
+    line.setAttribute("x2", p2.x);
+    line.setAttribute("y2", p2.y);
   });
 }
 function addLog(msg) {

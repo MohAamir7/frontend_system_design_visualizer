@@ -105,6 +105,31 @@ header{
   user-select: none;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
 }
+.node-instance[data-type="client"] {
+  border-color: #f472b6;
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.15);
+}
+.node-instance[data-type="load-balancer"] {
+  border-color: #a78bfa;
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+}
+.node-instance[data-type="api"] {
+  border-color: #38bdf8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+}
+.node-instance[data-type="cache"] {
+  border-color: #fbbf24;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+}
+.node-instance[data-type="database"] {
+  border-color: #34d399;
+  border-radius: 8px 8px 20px 20px;
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.15);
+}
+.node-instance[data-type="message-queue"] {
+  border-color: #fb923c;
+  box-shadow: 0 0 20px rgba(251, 146, 60, 0.15);
+}
 .node-instance:active {
   cursor: grabbing;
 }

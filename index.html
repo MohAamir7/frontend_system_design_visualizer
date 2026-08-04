@@ -16,17 +16,24 @@
     <div class="app">
         <aside class="sidebar">
              <h3>Components</h3>
-            <div class="node" id="client">Client</div>
-            <div class="node" id="api">API Server</div>
-            <div class="node" id="cache">Cache</div>
-            <div class="node" id="databse">DataBase</div>
+            <div class="node" data-type="client">Client</div>
+            <div class="node" data-type="api">API Server</div>
+            <div class="node" data-type="load-balancer">Load Balancer</div>
+            <div class="node" data-type="cache">Cache</div>
+            <div class="node" data-type="database">DataBase</div>
+            <div class="node" data-type="message-queue">Message Queue</div>
         </aside>
 
         <div class="canvas-container">
             <button id="simulate-btn">Simulate</button>
             <main id="canvas">
-                <svg id="connections"></svg>
-
+                <svg id="connections">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth" >
+                            <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8" />
+                        </marker>
+                    </defs>
+                </svg>
             </main>
         </div>
         <section class="config">
