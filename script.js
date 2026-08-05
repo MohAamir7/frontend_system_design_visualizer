@@ -72,6 +72,17 @@ function buildGraph() {
   return graph;
 }
 
+function findStartNodes(graph) {
+  const startNodes = [];
+  graph.forEach((entry) => {
+    if (entry.parents.length === 0) {
+      startNodes.push(entry);
+    }
+  });
+  return startNodes;  
+}
+
+
 console.log(buildGraph());
 
 const svg = document.getElementById("connections");
