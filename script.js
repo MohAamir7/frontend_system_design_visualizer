@@ -53,6 +53,27 @@ function makeDragable(el) {
 let selectNode = null;
 const edges = [];
 
+function buildGraph() {
+  const graph = new Map();
+
+  nodes.forEach((node) => {
+    graph.set(node.el, { node, children: [], parents: [] });
+  });
+
+  edges.forEach(({ from, to }) => {
+    const fromEntry = graph.get(from);
+    const toEntry = graph.get(to);
+    if (fromEntry && toEntry) {
+      fromEntry.children.push(toEntry);
+      toEntry.parents.push(fromEntry);
+    }
+  });
+
+  return graph;
+}
+
+console.log(buildGraph());
+
 const svg = document.getElementById("connections");
 canvas.addEventListener("click", (e) => {
   // console.log(e.target);
