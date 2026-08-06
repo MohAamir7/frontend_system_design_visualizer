@@ -79,10 +79,8 @@ function findStartNodes(graph) {
       startNodes.push(entry);
     }
   });
-  return startNodes;  
+  return startNodes;
 }
-
-
 console.log(buildGraph());
 
 const svg = document.getElementById("connections");
@@ -206,22 +204,29 @@ const simulate = document.getElementById("simulate-btn");
 
 simulate.addEventListener("click", simulateFunc);
 function simulateFunc() {
-  if(nodes.length === 0) return;
-   let running = true;
-
-  let totalLatency = 0;
+  const graph = buildGraph();
+  const entries = findStartNodes(graph);
+  if (entries.length === 0) {
+    addLog("No start nodes found. Please ensure there are nodes without incoming edges.");
+    return;
+  }
   
-  let chain = Promise.resolve();
-  nodes.forEach((node, idx) => {
-    chain = chain.then(() => {
-      return prevNode = idx === 0 ? null : nodes[idx - 1];
-      return latency = processed(node, prevNode).then((latency)=>{
-        totalLatency += latency;
-
-      });
+  let totalLatency = 0;
+  const processedNodes = new Map();
+  function traverse(entry,prevEntry){
+    if(processedNodes.has(entry))
+      return processedNodes.get(entry);
+    // processedNodes.add(entry);
+    const prevNode = prevEntry ? prevEntry.node : null;
+    const promise =  processed(entry.node, prevNode).then((latency) => {
+      totalLatency += latency;
+       return Promise.all(entry.children.map((childEntry) => traverse(childEntry, entry)));
     });
-  });
-  chain
+    processedNodes.set(entry,promise)
+    return promise;
+  }
+
+  Promise.all(entries.map((entry) => traverse(entry, null)))
     .then(() => {
       addLog("Request completed successfully 🎉");
       alert(`Request SUCCESS in ${totalLatency}ms`);
@@ -229,7 +234,25 @@ function simulateFunc() {
     .catch((error) => {
       addLog(error);
       alert(`Request FAILED after ${totalLatency}ms`);
-    });
+    }); 
+  // let chain = Promise.resolve();
+  // nodes.forEach((node, idx) => {
+    // chain = chain.then(() => {
+      // return prevNode = idx === 0 ? null : nodes[idx - 1];
+      // return latency = processed(node, prevNode).then((latency)=>{
+        // totalLatency += latency;
+      // });
+    // });
+  // });
+  // chain
+    // .then(() => {
+      // addLog("Request completed successfully 🎉");
+      // alert(`Request SUCCESS in ${totalLatency}ms`);
+    // })
+    // .catch((error) => {
+      // addLog(error);
+      // alert(`Request FAILED after ${totalLatency}ms`);
+   
 }
 
 // simulate.addEventListener("click",startFlowAnimation);
@@ -238,10 +261,10 @@ function simulateFunc() {
 //     line.classList.add("flow");
 //   });
 // }
-simulate.addEventListener("click", animateFlow);
-function animateFlow() {
-  edges.forEach(({ line }) => {
-    line.style.strokeDasharray = "5";
-    line.style.animation = "flow 1s linear infinite";
-  });
-}
+// simulate.addEventListener("click", animateFlow);
+// function animateFlow() {
+//   edges.forEach(({ line }) => {
+//     line.style.strokeDasharray = "5";
+//     line.style.animation = "flow 1s linear infinite";
+//   });
+// }
