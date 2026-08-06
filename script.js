@@ -11,19 +11,34 @@ document.querySelectorAll(".node").forEach((template) => {
     el.dataset.type = template.dataset.type;
     el.style.top = "100px";
     el.style.left = "100px";
+    const label = document.createElement("span");
+    label.textContent = template.textContent;
+    el.appendChild(label);
+    
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "X";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteNode(nodeData);
+    })
+    el.appendChild(deleteBtn);
+
     canvas.appendChild(el);
     makeDragable(el);
 
-    nodes.push({
+    const nodeData={
       id: nodecounter++,
       type: template.dataset.type,
       el,
       latency: 5000,
       failureRate: 0.01,
-    });
+    };
+    nodes.push(nodeData);
     // console.log(nodes[0].id);
   });
 });
+
 
 function makeDragable(el) {
   // console.log("start dragging");
@@ -279,3 +294,9 @@ function simulateFunc() {
 //     line.style.animation = "flow 1s linear infinite";
 //   });
 // }
+
+function deleteNode(nodeData) {
+  const edgesRemove = edges.filter((edge) => edge.from === nodeData.el || edge.to === nodeData.el);
+  console.log(edgesRemove);
+
+}

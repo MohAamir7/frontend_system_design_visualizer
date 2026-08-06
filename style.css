@@ -153,4 +153,24 @@ header{
     stroke-dashoffset: -16;
   }
 }
-
+/* .node-instance { */
+  /* position: relative; */
+/* } */
+.delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+}
+.node-instance:hover .delete-btn {
+  display: block;
+}
