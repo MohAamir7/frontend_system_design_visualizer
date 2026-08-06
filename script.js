@@ -214,10 +214,21 @@ function simulateFunc() {
   let totalLatency = 0;
   const processedNodes = new Map();
   function traverse(entry,prevEntry){
-    if(processedNodes.has(entry))
-      return processedNodes.get(entry);
-    // processedNodes.add(entry);
     const prevNode = prevEntry ? prevEntry.node : null;
+    console.log("traverse:", entry.node.el.textContent, "| from:", prevNode?.el.textContent, "| cached:", processedNodes.has(entry));
+
+  if (prevNode) {
+    animateEdge(prevNode.el, entry.node.el);
+  }
+    if(processedNodes.has(entry)){
+      const existingPromise = processedNodes.get(entry);
+      return existingPromise.then((result) => {
+        if(prevNode) {
+          stopEdge(prevNode.el, entry.node.el);
+        }
+        return result;
+      });
+    }
     const promise =  processed(entry.node, prevNode).then((latency) => {
       totalLatency += latency;
        return Promise.all(entry.children.map((childEntry) => traverse(childEntry, entry)));
