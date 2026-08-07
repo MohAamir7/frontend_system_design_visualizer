@@ -297,6 +297,16 @@ function simulateFunc() {
 
 function deleteNode(nodeData) {
   const edgesRemove = edges.filter((edge) => edge.from === nodeData.el || edge.to === nodeData.el);
+  edgesToRemove.forEach((edge) => {
+    edge.line.remove();
+    const idx = edges.indexOf(edge);
+    edges.splice(idx, 1);
+  });
+
+  nodeData.el.remove();
+
+  const nodeIdx = nodes.indexOf(nodeData);
+  nodes.splice(nodeIdx, 1);
   console.log(edgesRemove);
 
 }
