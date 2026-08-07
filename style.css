@@ -148,6 +148,9 @@ header{
   height: 100%;
   pointer-events: none;
 }
+#connections line {
+  pointer-events: none;
+}
 @keyframes flow {
   to {
     stroke-dashoffset: -16;
@@ -155,7 +158,7 @@ header{
 }
 /* .node-instance { */
   /* position: relative; */
-/* } */
+
 .delete-btn {
   position: absolute;
   top: -8px;

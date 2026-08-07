@@ -108,11 +108,27 @@ canvas.addEventListener("click", (e) => {
     // console.log(selectNode);
     selectNode.classList.add("active");
   } else {
+    if(selectNode === e.target) {
+      addLog("Cannot connect a node to itself.");
+      selectNode.classList.remove("active");
+      selectNode = null;
+      return;
+    }
+    if(edgeExists(selectNode, e.target)) {
+      addLog("Edge already exists between these nodes.");
+      selectNode.classList.remove("active");
+      selectNode = null;
+      return;
+    }
     drawline(selectNode, e.target);
     selectNode.classList.remove("active");
     selectNode = null;
   }
+  
 });
+function edgeExists(from, to) {
+  return edges.some(edge => edge.from === from && edge.to === to);
+}
 function edgePoint(rect, canvasRect, targetX, targetY) {
   const cx = rect.left + rect.width / 2 - canvasRect.left;
   const cy = rect.top + rect.height / 2 - canvasRect.top;
@@ -150,8 +166,29 @@ function drawline(from, to) {
   line.setAttribute("stroke-width", "2");
   line.setAttribute("marker-end", "url(#arrow)");
 
+
+   const hitArea = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  hitArea.setAttribute("x1", p1.x);
+  hitArea.setAttribute("y1", p1.y);
+  hitArea.setAttribute("x2", p2.x);
+  hitArea.setAttribute("y2", p2.y);
+  hitArea.setAttribute("stroke", "transparent");
+  hitArea.setAttribute("stroke-width", "16");
+  hitArea.style.cursor = "pointer";
+  hitArea.style.pointerEvents = "stroke";
+  // svg.appendChild(line);
+  svg.appendChild(hitArea);
+  
+
   svg.appendChild(line);
-  edges.push({ from, to, line });
+  const edgeData = ({ from, to,line,hitArea});
+
+  hitArea.addEventListener("click", (e) => {
+    e.stopPropagation();
+    deleteEdge(edgeData);
+    console.log(e);
+  });
+  edges.push(edgeData);
   // console.log(edges);
 }
 function updateline() {
@@ -297,16 +334,21 @@ function simulateFunc() {
 
 function deleteNode(nodeData) {
   const edgesRemove = edges.filter((edge) => edge.from === nodeData.el || edge.to === nodeData.el);
-  edgesToRemove.forEach((edge) => {
+  edgesRemove.forEach((edge) => {
     edge.line.remove();
     const idx = edges.indexOf(edge);
     edges.splice(idx, 1);
   });
-
   nodeData.el.remove();
+  const Nodeidx = nodes.indexOf(nodeData);
+  nodes.splice(Nodeidx, 1);
+}
 
-  const nodeIdx = nodes.indexOf(nodeData);
-  nodes.splice(nodeIdx, 1);
-  console.log(edgesRemove);
-
+function deleteEdge(edgeData) {
+  edgeData.line.remove();
+  edgeData.hitArea.remove();
+  const idx = edges.indexOf(edgeData);
+  if(idx !== -1){
+    edges.splice(idx, 1);
+  }
 }
