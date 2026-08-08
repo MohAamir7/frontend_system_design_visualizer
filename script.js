@@ -53,7 +53,16 @@ document.querySelectorAll(".node").forEach((template) => {
     // console.log(nodes[0].id);
   });
 });
+function editPanel(){
+  selectNodeEdit = null;
+  latency.value = "";
+  failure.value = "";
+  throughput.value = "";
+  document.querySelectorAll(".node-instance").forEach((el) => {
+    el.classList.remove("editing");
+  }); 
 
+}
 function selectEditNode(nodeData) {
   selectNodeEdit = nodeData;
   latency.value  = nodeData.latency;
@@ -94,6 +103,8 @@ function makeDragable(el) {
   // console.log("start dragging");
   let offsetX, offsetY;
   el.addEventListener("mousedown", (e) => {
+     console.log("mousedown target:", e.target, "closest button:", e.target.closest("button"));
+    if(e.target.closest("button")) return;
     const rect = el.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
@@ -415,6 +426,10 @@ function deleteNode(nodeData) {
     const idx = edges.indexOf(edge);
     edges.splice(idx, 1);
   });
+
+  if(selectNodeEdit === nodeData) {
+    editPanel();
+  }
   nodeData.el.remove();
   const Nodeidx = nodes.indexOf(nodeData);
   nodes.splice(Nodeidx, 1);
