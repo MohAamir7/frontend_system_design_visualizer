@@ -4,6 +4,10 @@ let nodecounter = 0;
 
 document.querySelectorAll(".node").forEach((template) => {
   template.addEventListener("click", () => {
+
+    const latency = document.getElementById("latency");
+    const failureRate = document.getElementById("failure");
+    const throughput = document.getElementById("throughput");
     // console.log("active");
     const el = document.createElement("div");
     el.className = "node-instance";
@@ -14,20 +18,31 @@ document.querySelectorAll(".node").forEach((template) => {
     const label = document.createElement("span");
     label.textContent = template.textContent;
     el.appendChild(label);
-    
+
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "X";
     deleteBtn.className = "delete-btn";
     deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       deleteNode(nodeData);
-    })
+    });
     el.appendChild(deleteBtn);
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "⚙";
+    editBtn.className = "edit-btn";
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // editNode(nodeData);
+      selectEditNode(nodeData);
+      console.log("Edit button clicked for node:", nodeData);
+    });
+    el.appendChild(editBtn);
 
     canvas.appendChild(el);
     makeDragable(el);
 
-    const nodeData={
+    const nodeData = {
       id: nodecounter++,
       type: template.dataset.type,
       el,
@@ -39,12 +54,46 @@ document.querySelectorAll(".node").forEach((template) => {
   });
 });
 
+function selectEditNode(nodeData) {
+  selectNodeEdit = nodeData;
+  latency.value  = nodeData.latency;
+  failure.value = (nodeData.failure *100).toFixed(2);
+  throughput.value = nodeData.throughput || 0;
+
+  document.querySelectorAll(".node-instance").forEach((el) => {
+    el.classList.remove("editing");
+  });
+  nodeData.el.classList.add("editing");
+}
+
+latency.addEventListener("input", (e) => {
+  if(!selectNodeEdit) return;
+  const value = parseFloat(e.target.value);
+  if (!isNaN(value) && value >= 0 ) {
+    selectNodeEdit.latency = value;
+  }
+});
+
+failure.addEventListener("input", (e) => {
+  if(!selectNodeEdit) return;
+  const value = parseFloat(e.target.value);
+  if (!isNaN(value) && value >= 0 && value <= 100) {
+    selectNodeEdit.failure = value / 100;
+  }
+});
+
+throughput.addEventListener("input", (e) => {
+  if(!selectNodeEdit) return;
+  const value = parseFloat(e.target.value);
+  if (!isNaN(value) && value >= 0 ) {
+    selectNodeEdit.throughput = isNaN(value) ? 0 : value;
+  }
+});
 
 function makeDragable(el) {
   // console.log("start dragging");
   let offsetX, offsetY;
   el.addEventListener("mousedown", (e) => {
-
     const rect = el.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
@@ -108,13 +157,13 @@ canvas.addEventListener("click", (e) => {
     // console.log(selectNode);
     selectNode.classList.add("active");
   } else {
-    if(selectNode === e.target) {
+    if (selectNode === e.target) {
       addLog("Cannot connect a node to itself.");
       selectNode.classList.remove("active");
       selectNode = null;
       return;
     }
-    if(edgeExists(selectNode, e.target)) {
+    if (edgeExists(selectNode, e.target)) {
       addLog("Edge already exists between these nodes.");
       selectNode.classList.remove("active");
       selectNode = null;
@@ -124,10 +173,9 @@ canvas.addEventListener("click", (e) => {
     selectNode.classList.remove("active");
     selectNode = null;
   }
-  
 });
 function edgeExists(from, to) {
-  return edges.some(edge => edge.from === from && edge.to === to);
+  return edges.some((edge) => edge.from === from && edge.to === to);
 }
 function edgePoint(rect, canvasRect, targetX, targetY) {
   const cx = rect.left + rect.width / 2 - canvasRect.left;
@@ -137,7 +185,11 @@ function edgePoint(rect, canvasRect, targetX, targetY) {
   const dx = targetX - cx;
   const dy = targetY - cy;
   const angle = Math.atan2(dy, dx);
-  const t = 1 / Math.sqrt(Math.pow(Math.cos(angle) / a, 2) + Math.pow(Math.sin(angle) / b, 2));
+  const t =
+    1 /
+    Math.sqrt(
+      Math.pow(Math.cos(angle) / a, 2) + Math.pow(Math.sin(angle) / b, 2),
+    );
   return { x: cx + t * Math.cos(angle), y: cy + t * Math.sin(angle) };
 }
 
@@ -152,8 +204,14 @@ function drawline(from, to) {
   // const y1 = r1.top + r1.height / 2 - canvasRect.top;
   // const x2 = r2.left + r2.width / 2 - canvasRect.left;
   // const y2 = r2.top + r2.height / 2 - canvasRect.top;
-  const c1 = { x: r1.left + r1.width / 2 - canvasRect.left, y: r1.top + r1.height / 2 - canvasRect.top };
-  const c2 = { x: r2.left + r2.width / 2 - canvasRect.left, y: r2.top + r2.height / 2 - canvasRect.top };
+  const c1 = {
+    x: r1.left + r1.width / 2 - canvasRect.left,
+    y: r1.top + r1.height / 2 - canvasRect.top,
+  };
+  const c2 = {
+    x: r2.left + r2.width / 2 - canvasRect.left,
+    y: r2.top + r2.height / 2 - canvasRect.top,
+  };
 
   const p1 = edgePoint(r1, canvasRect, c2.x, c2.y);
   const p2 = edgePoint(r2, canvasRect, c1.x, c1.y);
@@ -166,8 +224,10 @@ function drawline(from, to) {
   line.setAttribute("stroke-width", "2");
   line.setAttribute("marker-end", "url(#arrow)");
 
-
-   const hitArea = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const hitArea = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "line",
+  );
   hitArea.setAttribute("x1", p1.x);
   hitArea.setAttribute("y1", p1.y);
   hitArea.setAttribute("x2", p2.x);
@@ -178,10 +238,9 @@ function drawline(from, to) {
   hitArea.style.pointerEvents = "stroke";
   // svg.appendChild(line);
   svg.appendChild(hitArea);
-  
 
   svg.appendChild(line);
-  const edgeData = ({ from, to,line,hitArea});
+  const edgeData = { from, to, line, hitArea };
 
   hitArea.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -200,8 +259,14 @@ function updateline() {
     // const y1 = r1.top + r1.height / 2 - canvasRect.top;
     // const x2 = r2.left + r2.width / 2 - canvasRect.left;
     // const y2 = r2.top + r2.height / 2 - canvasRect.top;
-    const c1 = { x: r1.left + r1.width / 2 - canvasRect.left, y: r1.top + r1.height / 2 - canvasRect.top };
-    const c2 = { x: r2.left + r2.width / 2 - canvasRect.left, y: r2.top + r2.height / 2 - canvasRect.top };
+    const c1 = {
+      x: r1.left + r1.width / 2 - canvasRect.left,
+      y: r1.top + r1.height / 2 - canvasRect.top,
+    };
+    const c2 = {
+      x: r2.left + r2.width / 2 - canvasRect.left,
+      y: r2.top + r2.height / 2 - canvasRect.top,
+    };
 
     const p1 = edgePoint(r1, canvasRect, c2.x, c2.y);
     const p2 = edgePoint(r2, canvasRect, c1.x, c1.y);
@@ -214,10 +279,9 @@ function updateline() {
 }
 function addLog(msg) {
   console.log(msg);
-  
 }
 function animateEdge(fromNode, toNode) {
-  const edge = edges.find(e => e.from === fromNode && e.to === toNode);
+  const edge = edges.find((e) => e.from === fromNode && e.to === toNode);
   if (!edge) return;
 
   edge.line.style.strokeDasharray = "5";
@@ -225,31 +289,31 @@ function animateEdge(fromNode, toNode) {
 }
 
 function stopEdge(fromNode, toNode) {
-  const edge = edges.find(e => e.from === fromNode && e.to === toNode);
+  const edge = edges.find((e) => e.from === fromNode && e.to === toNode);
   if (!edge) return;
 
   edge.line.style.animation = "";
 }
-function processed(node,prevNode) {
-   return new Promise((res,rej)=>{
-    if(prevNode){
-      animateEdge(prevNode.el,node.el);
+function processed(node, prevNode) {
+  return new Promise((res, rej) => {
+    if (prevNode) {
+      animateEdge(prevNode.el, node.el);
     }
     addLog(`Request entered ${node.el.textContent}`);
-    setTimeout(()=>{
-      const failed = Math.random()<node.failureRate;
-      if(prevNode){
-        stopEdge(prevNode.el,node.el);
+    setTimeout(() => {
+      const failed = Math.random() < node.failureRate;
+      if (prevNode) {
+        stopEdge(prevNode.el, node.el);
       }
-      if(failed){
-        addLog(`${node.el.textContent} FAILED ❌`)
+      if (failed) {
+        addLog(`${node.el.textContent} FAILED ❌`);
         rej(`Failed at ${node.el.textContent}`);
-      }else{
+      } else {
         addLog(`${node.el.textContent} processed successfully ✅`);
-        res(node.latency)
+        res(node.latency);
       }
-    },5000)
-   })  
+    }, 5000);
+  });
 }
 
 const simulate = document.getElementById("simulate-btn");
@@ -259,33 +323,44 @@ function simulateFunc() {
   const graph = buildGraph();
   const entries = findStartNodes(graph);
   if (entries.length === 0) {
-    addLog("No start nodes found. Please ensure there are nodes without incoming edges.");
+    addLog(
+      "No start nodes found. Please ensure there are nodes without incoming edges.",
+    );
     return;
   }
-  
+
   let totalLatency = 0;
   const processedNodes = new Map();
-  function traverse(entry,prevEntry){
+  function traverse(entry, prevEntry) {
     const prevNode = prevEntry ? prevEntry.node : null;
-    console.log("traverse:", entry.node.el.textContent, "| from:", prevNode?.el.textContent, "| cached:", processedNodes.has(entry));
+    console.log(
+      "traverse:",
+      entry.node.el.textContent,
+      "| from:",
+      prevNode?.el.textContent,
+      "| cached:",
+      processedNodes.has(entry),
+    );
 
-  if (prevNode) {
-    animateEdge(prevNode.el, entry.node.el);
-  }
-    if(processedNodes.has(entry)){
+    if (prevNode) {
+      animateEdge(prevNode.el, entry.node.el);
+    }
+    if (processedNodes.has(entry)) {
       const existingPromise = processedNodes.get(entry);
       return existingPromise.then((result) => {
-        if(prevNode) {
+        if (prevNode) {
           stopEdge(prevNode.el, entry.node.el);
         }
         return result;
       });
     }
-    const promise =  processed(entry.node, prevNode).then((latency) => {
+    const promise = processed(entry.node, prevNode).then((latency) => {
       totalLatency += latency;
-       return Promise.all(entry.children.map((childEntry) => traverse(childEntry, entry)));
+      return Promise.all(
+        entry.children.map((childEntry) => traverse(childEntry, entry)),
+      );
     });
-    processedNodes.set(entry,promise)
+    processedNodes.set(entry, promise);
     return promise;
   }
 
@@ -297,25 +372,24 @@ function simulateFunc() {
     .catch((error) => {
       addLog(error);
       alert(`Request FAILED after ${totalLatency}ms`);
-    }); 
+    });
   // let chain = Promise.resolve();
   // nodes.forEach((node, idx) => {
-    // chain = chain.then(() => {
-      // return prevNode = idx === 0 ? null : nodes[idx - 1];
-      // return latency = processed(node, prevNode).then((latency)=>{
-        // totalLatency += latency;
-      // });
-    // });
+  // chain = chain.then(() => {
+  // return prevNode = idx === 0 ? null : nodes[idx - 1];
+  // return latency = processed(node, prevNode).then((latency)=>{
+  // totalLatency += latency;
+  // });
+  // });
   // });
   // chain
-    // .then(() => {
-      // addLog("Request completed successfully 🎉");
-      // alert(`Request SUCCESS in ${totalLatency}ms`);
-    // })
-    // .catch((error) => {
-      // addLog(error);
-      // alert(`Request FAILED after ${totalLatency}ms`);
-   
+  // .then(() => {
+  // addLog("Request completed successfully 🎉");
+  // alert(`Request SUCCESS in ${totalLatency}ms`);
+  // })
+  // .catch((error) => {
+  // addLog(error);
+  // alert(`Request FAILED after ${totalLatency}ms`);
 }
 
 // simulate.addEventListener("click",startFlowAnimation);
@@ -333,7 +407,9 @@ function simulateFunc() {
 // }
 
 function deleteNode(nodeData) {
-  const edgesRemove = edges.filter((edge) => edge.from === nodeData.el || edge.to === nodeData.el);
+  const edgesRemove = edges.filter(
+    (edge) => edge.from === nodeData.el || edge.to === nodeData.el,
+  );
   edgesRemove.forEach((edge) => {
     edge.line.remove();
     const idx = edges.indexOf(edge);
@@ -348,7 +424,7 @@ function deleteEdge(edgeData) {
   edgeData.line.remove();
   edgeData.hitArea.remove();
   const idx = edges.indexOf(edgeData);
-  if(idx !== -1){
+  if (idx !== -1) {
     edges.splice(idx, 1);
   }
 }
