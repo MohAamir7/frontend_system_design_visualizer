@@ -8,7 +8,10 @@ import { initConfigPanelInputs } from "/js/configPanel.js";
 
 
 document.querySelectorAll(".node").forEach((template) => {
-  template.addEventListener("click", () => createNodeInstances(template));
+  template.addEventListener("click", () =>
+    // console.log("template called");
+    
+    createNodeInstances(template));
 });
 
 // Click-to-connect: first click selects a node, second click draws an edge.

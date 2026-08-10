@@ -9,7 +9,16 @@ export function processed(node, prevNode) {
     if (prevNode) {
       animateEdge(prevNode.el, node.el);
     }
-    addLog(`Request entered ${node.el.textContent}`);
+    const isCacheHit = node.type === "cache" && node.cached;
+    const effectiveLatency = isCacheHit
+      ? Math.max(50, node.latency * 0.1)
+      : node.latency;
+
+    addLog(
+      isCacheHit
+        ? `${node.el.textContent} CACHE HIT ⚡`
+        : `Request entered ${node.el.textContent}`
+    );
     setTimeout(() => {
       const failed = Math.random() < node.failureRate;
       if (prevNode) {
@@ -18,11 +27,13 @@ export function processed(node, prevNode) {
       if (failed) {
         addLog(`${node.el.textContent} FAILED ❌`);
         rej(`Failed at ${node.el.textContent}`);
-      } else {
-        addLog(`${node.el.textContent} processed successfully ✅`);
-        res(node.latency);
+      } if (node.type === "cache") {
+        node.cached = true;
       }
-    }, 5000);
+
+      addLog(`${node.el.textContent} processed successfully ✅`);
+      res({ latency: effectiveLatency, skipChildren: isCacheHit });
+    }, effectiveLatency);
   });
 }
 export function simulateFunc() {
@@ -60,8 +71,8 @@ export function simulateFunc() {
         return result;
       });
     }
-    const promise = processed(entry.node, prevNode).then((latency) => {
-      totalLatency += latency;
+    const promise = processed(entry.node, prevNode).then((result) => {
+      totalLatency += result.latency;
       return Promise.all(
         entry.children.map((childEntry) => traverse(childEntry, entry)),
       );

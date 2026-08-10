@@ -8,7 +8,7 @@ import { edges } from "./state.js";
 
 
 export function createNodeInstances(template) {
-  template.addEventListener("click", () => {
+  console.log("template created");
 
     // const latency = document.getElementById("latency");
     // const failureRate = document.getElementById("failure");
@@ -61,8 +61,7 @@ export function createNodeInstances(template) {
     nodes.push(nodeData);
     return nodeData;
     // console.log(nodes[0].id);
-  });
-};
+  };
 export function deleteNode(nodeData) {
   const edgesRemove = edges.filter(
     (edge) => edge.from === nodeData.el || edge.to === nodeData.el,
