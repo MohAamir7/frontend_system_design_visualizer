@@ -3,6 +3,16 @@ import { animateEdge, stopEdge } from "/js/edges.js";
 import {addLog} from "/js/logger.js";
 
 
+function selectRoutingTargets(entry) {
+  const {node,children} = entry;
+  if(node.type !== "load-balancer" || children.length === 0) {
+    return children;
+  }
+
+  const chosen = children[node.rrIndex % children.length];
+  node.rrIndex++;
+  return [chosen];
+}
 
 export function processed(node, prevNode) {
   return new Promise((res, rej) => {
@@ -72,17 +82,24 @@ export function simulateFunc() {
       });
     }
     const promise = processed(entry.node, prevNode).then((result) => {
-      totalLatency += result.latency;
-      return Promise.all(
-        entry.children.map((childEntry) => traverse(childEntry, entry)),
-      );
-    });
+        totalLatency += result.latency;
+        if (result.skipChildren) return Promise.allSettled([]);
+        const targets = selectRoutingTargets(entry);
+        return Promise.allSettled(
+          targets.map((child) => traverse(child, entry))
+        );
+      })
+      .catch((error) => {
+        failures.push(error);
+        throw error;
+      });
     processedNodes.set(entry, promise);
     return promise;
-  }
+}
 
-  Promise.all(entries.map((entry) => traverse(entry, null)))
+  Promise.allSettled(entries.map((entry) => traverse(entry, null)))
     .then(() => {
+      // console.log(entry);
       addLog("Request completed successfully 🎉");
       alert(`Request SUCCESS in ${totalLatency}ms`);
     })

@@ -31,7 +31,9 @@ export function createNodeInstances(template) {
       el,
       latency: 5000,
       failureRate: 0.01,
-      throughput: 0
+      throughput: 0,
+      cached:false,
+      rrIndex:0
     };
 
     const deleteBtn = document.createElement("button");
