@@ -8,6 +8,7 @@ export const simulateBtn = document.getElementById("simulate-btn");
 export const latency = document.getElementById("latency");
 export const failure = document.getElementById("failure");
 export const throughput = document.getElementById("throughput");
+export const retries = document.getElementById("retries");
 
 
 // Graph data

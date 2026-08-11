@@ -10,13 +10,13 @@ import { edges } from "./state.js";
 export function createNodeInstances(template) {
   console.log("template created");
 
-    // const latency = document.getElementById("latency");
-    // const failureRate = document.getElementById("failure");
-    // const throughput = document.getElementById("throughput");
-    // console.log("active");
+    const latency = document.getElementById("latency");
+    const failureRate = document.getElementById("failure");
+    const throughput = document.getElementById("throughput");
+    console.log("active");
     const el = document.createElement("div");
     el.className = "node-instance";
-    el.textContent = template.textContent;
+    // el.textContent = template.textContent;
     el.dataset.type = template.dataset.type;
     el.style.top = "100px";
     el.style.left = "100px";
@@ -33,7 +33,8 @@ export function createNodeInstances(template) {
       failureRate: 0.01,
       throughput: 0,
       cached:false,
-      rrIndex:0
+      rrIndex:0,
+      maxRetries: 0,
     };
 
     const deleteBtn = document.createElement("button");

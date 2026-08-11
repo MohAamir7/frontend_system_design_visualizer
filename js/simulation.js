@@ -14,11 +14,10 @@ function selectRoutingTargets(entry) {
   return [chosen];
 }
 
-export function processed(node, prevNode) {
+const Retry_BackOff_Ms = 500;
+
+function attemptOnce(node){
   return new Promise((res, rej) => {
-    if (prevNode) {
-      animateEdge(prevNode.el, node.el);
-    }
     const isCacheHit = node.type === "cache" && node.cached;
     const effectiveLatency = isCacheHit
       ? Math.max(50, node.latency * 0.1)
@@ -31,7 +30,7 @@ export function processed(node, prevNode) {
     );
     setTimeout(() => {
       const failed = Math.random() < node.failureRate;
-      if (prevNode) {
+      if (failed) {
         stopEdge(prevNode.el, node.el);
       }
       if (failed) {
@@ -45,6 +44,54 @@ export function processed(node, prevNode) {
       res({ latency: effectiveLatency, skipChildren: isCacheHit });
     }, effectiveLatency);
   });
+}
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+export async function processed(node, prevNode) {
+  console.log(node);
+  if(prevNode) {
+    animateEdge(prevNode.el, node.el);
+  }
+  const isCacheHit = node.type === "cache" && node.cached;
+  addLog(
+    isCacheHit
+      ? `${node.el.textContent} CACHE HIT ⚡`
+      : `Request entered ${node.el.textContent}`
+  );
+  const totalAttempts = node.maxRetries + 1;
+  let totalLatencyUsed = 0;
+ 
+  for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+    try {
+      const result = await attemptOnce(node);
+      totalLatencyUsed += result.latency;
+ 
+      if (prevNode) {
+        stopEdge(prevNode.el, node.el);
+      }
+      addLog(`${node.el.textContent} processed successfully ✅`);
+      return { latency: totalLatencyUsed, skipChildren: result.skipChildren };
+    } catch {
+      totalLatencyUsed += node.latency;
+      const willRetry = attempt < totalAttempts;
+ 
+      addLog(
+        willRetry
+          ? `${node.el.textContent} FAILED ❌ - retrying (${attempt}/${node.maxRetries})`
+          : `${node.el.textContent} FAILED ❌`
+      );
+ 
+      if (willRetry) {
+        await wait(Retry_BackOff_Ms);
+      } else {
+        if (prevNode) {
+          stopEdge(prevNode.el, node.el);
+        }
+        throw `Failed at ${node.el.textContent} after ${totalAttempts} attempt(s)`;
+      }
+    }
+  }
 }
 export function simulateFunc() {
   const graph = buildGraph();
