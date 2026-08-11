@@ -36,24 +36,23 @@ function attemptOnce(node){
       ? Math.max(50, node.latency * 0.1)
       : node.latency;
 
-    addLog(
-      isCacheHit
-        ? `${node.el.textContent} CACHE HIT ⚡`
-        : `Request entered ${node.el.textContent}`
-    );
+    // addLog(
+    //   isCacheHit
+    //     ? `${node.el.textContent} CACHE HIT ⚡`
+    //     : `Request entered ${node.el.textContent}`
+    // );
     setTimeout(() => {
       const failed = Math.random() < node.failureRate;
       if (failed) {
-        stopEdge(prevNode.el, node.el);
+        // stopEdge(prevNode.el, node.el);
+        rej();
+        return;
       }
-      if (failed) {
-        addLog(`${node.el.textContent} FAILED ❌`);
-        rej(`Failed at ${node.el.textContent}`);
-      } if (node.type === "cache") {
+     if (node.type === "cache") {
         node.cached = true;
       }
 
-      addLog(`${node.el.textContent} processed successfully ✅`);
+      // addLog(`${node.el.textContent} processed successfully ✅`);
       res({ latency: effectiveLatency, skipChildren: isCacheHit });
     }, effectiveLatency);
   });
@@ -143,11 +142,11 @@ export function simulateFunc() {
     }
     if (processedNodes.has(entry)) {
       const existingPromise = processedNodes.get(entry);
-      return existingPromise.finally((result) => {
+      return existingPromise.finally(() => {
         if (prevNode) {
           stopEdge(prevNode.el, entry.node.el);
         }
-        return result;
+        // return result;
       });
     }
     const promise = processed(entry.node, prevNode).then((result) => {
