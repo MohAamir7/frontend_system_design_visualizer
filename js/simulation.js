@@ -15,6 +15,19 @@ function selectRoutingTargets(entry) {
 }
 
 const Retry_BackOff_Ms = 500;
+const Rate_Limit_Window_Ms = 1000;
+function isRateLimited(node) {
+  if(!node.throughput || node.throughput <= 0) {
+    return false;
+  }
+  const now = Date.now();
+  node.requestLog = node.requestLog.filter((timestamp) => now - timestamp < Rate_Limit_Window_Ms);
+  if(node.requestLog.length >= node.throughput) {
+    return true;
+  }
+  node.requestLog.push(now);
+  return false;
+}
 
 function attemptOnce(node){
   return new Promise((res, rej) => {
@@ -52,6 +65,14 @@ export async function processed(node, prevNode) {
   console.log(node);
   if(prevNode) {
     animateEdge(prevNode.el, node.el);
+  }
+
+  if(isRateLimited(node)) {
+    addLog(`${node.el.textContent} RATE LIMITED 🚫`);
+    if(prevNode) {
+      stopEdge(prevNode.el, node.el);
+    }
+    throw `Rate limited at ${node.el.textContent}`;
   }
   const isCacheHit = node.type === "cache" && node.cached;
   addLog(
@@ -104,6 +125,7 @@ export function simulateFunc() {
   }
 
   let totalLatency = 0;
+  const failures = [];
   const processedNodes = new Map();
    function traverse(entry, prevEntry) {
     const prevNode = prevEntry ? prevEntry.node : null;
@@ -121,7 +143,7 @@ export function simulateFunc() {
     }
     if (processedNodes.has(entry)) {
       const existingPromise = processedNodes.get(entry);
-      return existingPromise.then((result) => {
+      return existingPromise.finally((result) => {
         if (prevNode) {
           stopEdge(prevNode.el, entry.node.el);
         }
@@ -147,10 +169,17 @@ export function simulateFunc() {
   Promise.allSettled(entries.map((entry) => traverse(entry, null)))
     .then(() => {
       // console.log(entry);
+      if(failures.length === 0) {
       addLog("Request completed successfully 🎉");
       alert(`Request SUCCESS in ${totalLatency}ms`);
-    })
-    .catch((error) => {
-      addLog(error);
-      alert(`Request FAILED after ${totalLatency}ms`);
-    });}
+      } else {
+        addLog(`Request completed with ${failures.length} failure(s)`);
+    alert(
+      `Request FAILED at:\n${failures.join(
+        "\n"
+      )}\n\nTotal latency so far: ${totalLatency}ms`
+    );
+      }
+    }
+  )
+}

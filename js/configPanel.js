@@ -4,12 +4,12 @@ import {
   throughput,
   retries,
   setSelectForNodeEdit,
-  setSelectNode,
+  selectForNodeEdit,
 } from "/js/state.js";
 
 export function selectEditNode(nodeData) {
-  setSelectNodeEdit(nodeData);
-  selectNodeEdit = nodeData;
+  setSelectForNodeEdit(nodeData);
+  // selectNodeEdit = nodeData;
   latency.value = nodeData.latency;
   failure.value = (nodeData.failure * 100).toFixed(2);
   throughput.value = nodeData.throughput || 0;
@@ -22,8 +22,8 @@ export function selectEditNode(nodeData) {
 }
 
 export function editPanel() {
-  setSelectNodeEdit(null);
-  selectNodeEdit = null;
+  setSelectForNodeEdit(null);
+  // selectNodeEdit = null;
   latency.value = "";
   failure.value = "";
   retries.value = "";
@@ -40,23 +40,23 @@ export function initConfigPanelInputs() {
     if (!isNaN(value) && value >= 0) selectedForEdit.latency = value;
   });
   failure.addEventListener("input", (e) => {
-    if (!selectNodeEdit) return;
+    if (!selectForNodeEdit) return;
     const value = parseFloat(e.target.value);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      selectNodeEdit.failure = value / 100;
+      selectForNodeEdit.failure = value / 100;
     }
   });
 
   throughput.addEventListener("input", (e) => {
-    if (!selectNodeEdit) return;
+    if (!selectForNodeEdit) return;
     const value = parseFloat(e.target.value);
     if (!isNaN(value) && value >= 0) {
-      selectNodeEdit.throughput = isNaN(value) ? 0 : value;
+      selectForNodeEdit.throughput = isNaN(value) ? 0 : value;
     }
   });
   retries.addEventListener("input", (e) => {
-    if (!selectNodeEdit) return;
+    if (!selectForNodeEdit) return;
     const value = parseInt(e.target.value, 10);
-    selectNodeEdit.maxRetries = !isNaN(value) && value >= 0 ? value : 0;
+    selectForNodeEdit.maxRetries = !isNaN(value) && value >= 0 ? value : 0;
   });
 }

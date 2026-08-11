@@ -35,6 +35,7 @@ export function createNodeInstances(template) {
       cached:false,
       rrIndex:0,
       maxRetries: 0,
+      requestLog: [],
     };
 
     const deleteBtn = document.createElement("button");
