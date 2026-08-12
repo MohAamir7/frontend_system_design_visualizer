@@ -25,7 +25,12 @@
         </aside>
 
         <div class="canvas-container">
-            <button id="simulate-btn">Simulate</button>
+            <div class="toolbar">
+                <button id="simulate-btn">Simulate</button>
+                <button id="export-btn"  class="toolbar-btn">Export</button>
+                <input type="file" id="import-input" accept="application/json" style="display: none;" />
+                <button id="import-btn" class="toolbar-btn">Import</button>
+            </div>
             <main id="canvas">
                 <svg id="connections">
                     <defs>
