@@ -84,5 +84,59 @@ export function deleteNode(nodeData) {
   if (Nodeidx !== -1){
     nodes.splice(Nodeidx, 1);
   }
+  document.dispatchEvent(new Event("diagram:change"));
 }
+export function createRestoredNode(saved) {
+  const el = document.createElement("div");
+  el.className = "node-instance";
+  el.dataset.type = saved.type;
+  el.style.left = saved.left;
+  el.style.top = saved.top;
 
+  const label = document.createElement("span");
+  label.textContent = saved.label;
+  el.appendChild(label);
+
+  const nodeData = {
+    id: saved.id,
+    type: saved.type,
+    el,
+    latency: saved.latency,
+    failure: saved.failureRate,
+    throughput: saved.throughput || 0,
+    maxRetries: saved.maxRetries || 0,
+    cached: false,
+    rrIndex: 0,
+    requestLog: [],
+  };
+
+  // reuse the SAME delete/edit button creation code you already have
+  // in createNodeInstance here, wiring both to this nodeData.
+  const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "X";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteNode(nodeData);
+    });
+    el.appendChild(deleteBtn);
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "⚙";
+    editBtn.className = "edit-btn";
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // editNode(nodeData);
+      selectEditNode(nodeData);
+      console.log("Edit button clicked for node:", nodeData);
+    });
+    el.appendChild(editBtn);
+
+  canvas.appendChild(el);
+  makeDragable(el);
+  nodes.push(nodeData);
+
+  document.dispatchEvent(new Event("diagram:change"));
+
+  return nodeData;
+}

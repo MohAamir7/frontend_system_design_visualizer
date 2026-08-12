@@ -23,6 +23,7 @@ export function makeDragable(el) {
     };
     document.onmouseup = () => {
       document.onmousemove = null;
+      document.dispatchEvent(new Event("diagram:change"));
     };
   });
 }

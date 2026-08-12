@@ -6,6 +6,21 @@ import { simulateFunc } from "/js/simulation.js";
 import { addLog } from "/js/logger.js";
 import { initConfigPanelInputs } from "/js/configPanel.js";
 
+import { saveToLocalStorage, loadFromLocalStorage, exportDiagram, importDiagramFromFile } from "/js/persistance.js";
+
+loadFromLocalStorage();
+
+document.addEventListener("diagram:change", saveToLocalStorage);
+
+document.getElementById("export-btn").addEventListener("click", exportDiagram);
+
+const importInput = document.getElementById("import-input");
+document.getElementById("import-btn").addEventListener("click", () => importInput.click());
+importInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) importDiagramFromFile(file);
+});
+
 
 document.querySelectorAll(".node").forEach((template) => {
   template.addEventListener("click", () =>
