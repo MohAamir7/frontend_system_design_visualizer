@@ -106,5 +106,9 @@ export function importDiagramFromFile(file) {
   };
   reader.readAsText(file);
 }
-
+export function clearDiagram(){
+    clearCanvas();
+    localStorage.removeItem(STORAGE_KEY);
+    document.dispatchEvent(new Event("diagram:change"))
+}
 

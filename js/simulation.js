@@ -1,6 +1,7 @@
 import { buildGraph,findStartNodes } from "/js/graph.js";
 import { animateEdge, stopEdge } from "/js/edges.js";
 import {addLog} from "/js/logger.js";
+import { resetMetrics, recordSuccess, recordFailure } from "/js/metrics.js";
 
 
 function selectRoutingTargets(entry) {
@@ -42,7 +43,7 @@ function attemptOnce(node){
     //     : `Request entered ${node.el.textContent}`
     // );
     setTimeout(() => {
-      const failed = Math.random() < node.failureRate;
+      const failed = Math.random() < node.failure;
       if (failed) {
         // stopEdge(prevNode.el, node.el);
         rej();
@@ -67,6 +68,7 @@ export async function processed(node, prevNode) {
   }
 
   if(isRateLimited(node)) {
+    recordFailure();
     addLog(`${node.el.textContent} RATE LIMITED 🚫`);
     if(prevNode) {
       stopEdge(prevNode.el, node.el);
@@ -91,6 +93,7 @@ export async function processed(node, prevNode) {
         stopEdge(prevNode.el, node.el);
       }
       addLog(`${node.el.textContent} processed successfully ✅`);
+      recordSuccess(totalLatencyUsed);
       return { latency: totalLatencyUsed, skipChildren: result.skipChildren };
     } catch {
       totalLatencyUsed += node.latency;
@@ -105,6 +108,7 @@ export async function processed(node, prevNode) {
       if (willRetry) {
         await wait(Retry_BackOff_Ms);
       } else {
+        recordFailure();
         if (prevNode) {
           stopEdge(prevNode.el, node.el);
         }
@@ -114,6 +118,7 @@ export async function processed(node, prevNode) {
   }
 }
 export function simulateFunc() {
+  resetMetrics();
   const graph = buildGraph();
   const entries = findStartNodes(graph);
   if (entries.length === 0) {

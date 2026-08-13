@@ -5,14 +5,19 @@ import { edgeExists } from "/js/graph.js";
 import { simulateFunc } from "/js/simulation.js";
 import { addLog } from "/js/logger.js";
 import { initConfigPanelInputs } from "/js/configPanel.js";
+import { initMetricsPanel } from "./metrics.js";
 
-import { saveToLocalStorage, loadFromLocalStorage, exportDiagram, importDiagramFromFile } from "/js/persistance.js";
+import { saveToLocalStorage, loadFromLocalStorage, exportDiagram, importDiagramFromFile,clearDiagram } from "/js/persistance.js";
 
 loadFromLocalStorage();
 
 document.addEventListener("diagram:change", saveToLocalStorage);
 
 document.getElementById("export-btn").addEventListener("click", exportDiagram);
+document.getElementById("clear-btn").addEventListener("click",(()=>{
+  const confirmed = confirm("Clear the entire diagram? This can't be undone.");
+  if(confirmed) clearDiagram();
+}));
 
 const importInput = document.getElementById("import-input");
 document.getElementById("import-btn").addEventListener("click", () => importInput.click());
@@ -57,7 +62,9 @@ canvas.addEventListener("click", (e) => {
   setSelectNode(null);
 });
 
+
 initConfigPanelInputs();
+initMetricsPanel(document.getElementById("metrics-panel"));
 simulateBtn.addEventListener("click", simulateFunc);
 
   // let chain = Promise.resolve();

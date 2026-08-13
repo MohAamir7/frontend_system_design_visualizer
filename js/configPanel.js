@@ -35,7 +35,7 @@ export function editPanel() {
 
 export function initConfigPanelInputs() {
   latency.addEventListener("input", (e) => {
-    if (!selectedForEdit) return;
+    if (!selectForEdit) return;
     const value = parseFloat(e.target.value);
     if (!isNaN(value) && value >= 0) selectedForEdit.latency = value;
   });
