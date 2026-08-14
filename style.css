@@ -2,7 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family:  -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    system-ui, sans-serif;
 }
 body {
   background: #0b1320;
@@ -16,18 +17,37 @@ body {
   height: calc(100vh-70px);
 }
 header{
-    padding: 16px 24px;
-    font-weight: 600;
-    border: 1px solid #1f2937;
-    font-size: 28px;
+    padding: 18px 28px;
+  border-bottom: 1px solid #1f2937;
+  background: linear-gradient(180deg, #0f172a, #0b1320);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+header h1 {
+   padding: 18px 28px;
+  border-bottom: 1px solid #1f2937;
+  background: linear-gradient(180deg, #0f172a, #0b1320);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+header .tagline{
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 400;
 }
 .sidebar{
-    border: 1px solid #1f2937;
-    padding: 20px 24px;
+     border: 1px solid #1f2937;
+  padding: 20px 24px;
 }
 .sidebar h3 {
   margin-bottom: 16px;
-  font-size: 18px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-weight: 600;
 }
 .node{
     padding: 19px 15px;
@@ -42,10 +62,66 @@ header{
     background: #1e293b;
   transform: translateY(-2px);
 }
+.legend {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #1f2937;
+}
+ 
+.legend h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+ 
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+ 
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+ 
+.legend-active {
+  border: 2px solid #38bdf8;
+  background: transparent;
+}
+ 
+.legend-editing {
+  border: 2px solid #fbbf24;
+  background: transparent;
+}
 .canvas-container{
     position: relative;
     background: radial-gradient(circle at top, #0f172a, #020617);
     overflow: hidden;
+}
+.empty-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.8;
+  pointer-events: none;
+  user-select: none;
+}
+ 
+.empty-hint.hidden {
+  display: none;
 }
 #simulate-btn{
     /* position: relative; */
@@ -88,6 +164,14 @@ header{
   border: 1px solid #334155;
   background: #020617;
   color: #e5e7eb;
+  font-size: 14px;
+  -moz-appearance: textfield;
+}
+ 
+.config input::-webkit-outer-spin-button,
+.config input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .config input:focus {
   outline: none;

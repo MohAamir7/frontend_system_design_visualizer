@@ -9,6 +9,7 @@
 <body>
     <header>
         <h1>System Design Visualizer</h1>
+        <span class="tagline">Drag, Connect, Simulate</span>
         <!-- <button class="simulate-btn">Simulate</button> -->
 
     </header>
@@ -22,6 +23,18 @@
             <div class="node" data-type="cache">Cache</div>
             <div class="node" data-type="database">DataBase</div>
             <div class="node" data-type="message-queue">Message Queue</div>
+
+
+            <div class="legend">
+        <h4>Node states</h4>
+        <div class="legend-row">
+          <span class="legend-swatch legend-active"></span>
+          <span>Selected to connect</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-swatch legend-editing"></span>
+          <span>Open in config panel</span>
+        </div>
         </aside>
 
         <div class="canvas-container">
@@ -33,6 +46,10 @@
                 <button id="clear-btn" class="toolbar-btn toolbar-btn-danger">clear Diagram</button>
             </div>
             <main id="canvas">
+                <div id="empty-hint" class="empty-hint">
+          <p>Click a component on the left to place it here.</p>
+          <p>Click two nodes in a row to connect them.</p>
+        </div>
                 <svg id="connections">
                     <defs>
                         <marker id="arrow" viewBox="0 0 10 10" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth" >
