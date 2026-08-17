@@ -13,7 +13,7 @@ export function makeDragable(el) {
     // console.log(e.clientX);
     // offsetX = e.clientX;
     // offsetY = e.clientY;
-    console.log(offsetX, offsetY);
+    // console.log(offsetX, offsetY);
     // el.addEventListener("mousemove",mouseMovehandler);
     // el.addEventListener("mouseUp",mouseUp);/
     document.onmousemove = (ev) => {
