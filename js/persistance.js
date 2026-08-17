@@ -101,7 +101,7 @@ export function importDiagramFromFile(file) {
       addLog("Diagram imported successfully.");
     } catch (err) {
       addLog("Import failed - the file isn't a valid diagram.");
-      console.error(err);
+      // console.error(err);
     }
   };
   reader.readAsText(file);

@@ -30,7 +30,7 @@ export function findStartNodes(graph) {
   });
   return startNodes;
 }
-console.log(buildGraph());
+// console.log(buildGraph());
 
 export function edgeExists(from, to) {
   return edges.some((edge) => edge.from === from && edge.to === to);

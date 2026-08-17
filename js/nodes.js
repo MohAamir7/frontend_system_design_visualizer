@@ -8,16 +8,17 @@ import { edges } from "./state.js";
 
 
 export function createNodeInstances(template) {
-  console.log("template created");
+  // console.log("template created");
 
     const latency = document.getElementById("latency");
     const failureRate = document.getElementById("failure");
     const throughput = document.getElementById("throughput");
-    console.log("active");
+    // console.log("active");
     const el = document.createElement("div");
     el.className = "node-instance";
     // el.textContent = template.textContent;
     el.dataset.type = template.dataset.type;
+    console.log(template.dataset.type);
     el.style.top = "100px";
     el.style.left = "100px";
     const label = document.createElement("span");
