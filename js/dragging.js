@@ -5,11 +5,7 @@ export function makeDragable(el) {
   // console.log("start dragging");
   let offsetX, offsetY;
   el.addEventListener("mousedown", (e) => {
-<<<<<<< HEAD
-    //  console.log("mousedown target:", e.target, "closest button:", e.target.closest("button"));
-=======
-     // console.log("mousedown target:", e.target, "closest button:", e.target.closest("button"));
->>>>>>> 12662bb5fe106227ae08b0bab9e557b1f14491d3
+    // console.log("mousedown target:", e.target, "closest button:", e.target.closest("button"));
     if(e.target.closest("button")) return;
     const rect = el.getBoundingClientRect();
     offsetX = e.clientX - rect.left;

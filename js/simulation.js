@@ -133,14 +133,14 @@ export function simulateFunc() {
   const processedNodes = new Map();
    function traverse(entry, prevEntry) {
     const prevNode = prevEntry ? prevEntry.node : null;
-    console.log(
-      "traverse:",
-      entry.node.el.textContent,
-      "| from:",
-      prevNode?.el.textContent,
-      "| cached:",
-      processedNodes.has(entry),
-    );
+    // console.log(
+    //   "traverse:",
+    //   entry.node.el.textContent,
+    //   "| from:",
+    //   prevNode?.el.textContent,
+    //   "| cached:",
+    //   processedNodes.has(entry),
+    // );
 
     if (prevNode) {
       animateEdge(prevNode.el, entry.node.el);
